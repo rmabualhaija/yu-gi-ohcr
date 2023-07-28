@@ -16,8 +16,8 @@ class YugiohCardDB:
 
         return self._cards_collection
 
-    def _upload_all_cards_to_mongo(self) -> None:
-        self.cards_collection.insert_many(self.cards_response)
+    def _upload_all_cards_to_mongo(self, cards) -> None:
+        self.cards_collection.insert_many(cards)
     
     def update_card_sets_and_prices(self):
         for card in self.cards_collection:
@@ -47,3 +47,10 @@ class YugiohCardDB:
                 
             results.append((set_id, card))
          return results
+    
+    def get_all_cards(self) -> list[dict[str, Any]]:
+        cards = []
+        results = self.cards_collection.find(limit=0)
+        for doc in results:
+            cards.append(doc)
+        return cards
