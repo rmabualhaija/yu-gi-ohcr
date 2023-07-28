@@ -1,5 +1,8 @@
 from typing import Any
+import logging
 from pymongo import MongoClient
+
+log = logging.getLogger(__name__)
 
 class YugiohCardDB:
     def __init__(self):
