@@ -18,7 +18,19 @@ def select_random_image_samples(sample_size: int) -> np.array:
     num_chunks = len(image_files)/sample_size
     samples = np.array_split(image_files, num_chunks)
     return samples
-    
+
+
+def select_random_bg_images(num_images) -> np.array:
+    """ Select num_images random background images.
+
+    Args:
+        num_images (int): The number of background images to select.
+    Returns:
+        np.array: A numpy array of the selected background images
+    """
+    background_images = np.array(os.listdir('dtd/'))
+    background_images = [np.random.choice(len(background_images), size=num_images, replace=False)]
+    return background_images
     
 
 def resize_image(image, scale_factor) -> np.array:
@@ -62,12 +74,47 @@ def translate_image(image: np.array, x: int, y: int) -> np.array:
         x (int): The horizontal translation of the image
         vertical_translation (int): The vertical translation of the image
     """
-    rows,cols = img.shape
+    rows,cols = image.shape
     translation_matrix = np.float32([[1,0,x],[0,1,y]])
-    translated_image = cv2.warpAffine(img, translation_matrix, (cols,rows))
+    translated_image = cv2.warpAffine(image, translation_matrix, (cols,rows))
 
     return translated_image
 
+def apply_random_orientation(image: np.array) -> np.array:
+    """ Take an image and apply the following transformations:
+        - Scale the image by 0.75
+        - Rotate the image a random amount
+        - Translate it a random amount on the x and y axis between -100 and 100
+
+    Args:
+        image (np.array): The image to apply transformations to
+
+    Returns:
+        _type_: The translated image
+    """
+     
+    rotation_angle = random.randint(0,359)
+    x_translation = random.randint(-100, 100)
+    y_translation = random.randint(-100, 100)
+    scaled_image = resize_image(0.75)
+    transformed_image = rotate_image(scaled_image, rotation_angle)
+    transformed_image = translate_image(transformed_image, x=x_translation, y=y_translation)
+    return transformed_image
+
+def generate_random_image():
+    images = select_random_image_samples(10)
+    loaded_images = []
+    test_images = images[0]
+    for image in test_images:
+        loaded_images.append(cv2.imread(f'card_images/{image}'))
+    
+    transformed_images = []   
+    for image in loaded_images:
+         transformed_images.append(apply_random_orientation(image))
+        
+        
+    
+    
 
 # img = cv2.imread('card_images/31230289.jpg')
 # img2 = cv2.imread('card_images/38479725.jpg')
@@ -85,4 +132,5 @@ def translate_image(image: np.array, x: int, y: int) -> np.array:
 # cv2.destroyAllWindows()
 
 
-print(select_random_image_samples(10))
+# print(select_random_image_samples(10))
+print(select_random_bg_images(10))
